@@ -9,6 +9,9 @@ __pycache__/
 # Documents
 data/
 
+# Vector Databases
+vector_dbs/
+
 # Distribution / packaging
 .Python
 build/

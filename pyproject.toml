@@ -16,5 +16,6 @@ dependencies = [
     "numpy>=2.4.2",
     "plotly>=6.5.2",
     "scikit-learn>=1.8.0",
+    "sentence-transformers>=5.2.3",
     "tiktoken>=0.12.0",
 ]
