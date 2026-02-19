@@ -12,6 +12,9 @@ data/
 # Vector Databases
 vector_dbs/
 
+# Test Sets
+test-sets/
+
 # Distribution / packaging
 .Python
 build/
