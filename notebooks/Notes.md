@@ -7,6 +7,8 @@ NOTE: Use Codex to make this document better
 - Gemini embedding
 - Hugging Face all-MiniLM-L6-v2
 
+(TIP): check embedding leaderboards such as: https://huggingface.co/spaces/mteb/leaderboard
+
 ### Vectorstores
 - Open-Source
     - Chroma
@@ -38,3 +40,17 @@ NOTE: Use Codex to make this document better
 9. Graph RAG: retrieve content closely related to similar documents
 10. Agentic RAG: use Agents for retrieval, combining with Memory and Tools such as SQL
     - Base use case: SQL queries for number (organized data) extraction and Vector Retrieval for word (unorganized data) extraction
+
+
+### Model selection before Evals
+
+Before even running evals, optimizing RAG or even fine-tunning. The best time spent would be chosing the best model possible for a particular use case. Before optimizing anyhthing else, model selection could yield the best ROI in terms of time-spent / quality of the system (responses).
+
+Here are some great reasources that rank models based on certain benchmarks:
+- Artificial Analysis: https://artificialanalysis.ai/  
+- Vellum: https://www.vellum.ai/llm-leaderboard?utm_source=google&utm_medium=organic  
+- Scale (SEAL): https://scale.com/leaderboard  
+- LiveBench: https://livebench.ai/#/  
+- LMArena: https://arena.ai/leaderboard/  
+- HugginFace Spaces: https://huggingface.co/spaces?search=leaderboard  
+    - (Plus): also provides leaderboards for embedding models and other specifics (model performance, OCR, speed, industry specific, etc)
