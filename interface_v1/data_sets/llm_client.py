@@ -31,7 +31,7 @@ def call_llm(
     except ImportError:
         raise ImportError(
             "litellm is required. Install it with:\n"
-            "  pip install litellm"
+            "  uv add litellm"
         )
 
     messages = [{"role": "user", "content": prompt}]
