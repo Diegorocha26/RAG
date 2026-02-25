@@ -10,7 +10,6 @@ from interface_v1.pro_implementation.answer import fetch_context, answer_questio
 load_dotenv(override=True)
 
 MODEL = "gpt-4.1-nano"
-db_name = "vector_db"
 
 
 class RetrievalEval(BaseModel):

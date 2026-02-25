@@ -123,7 +123,7 @@ def fetch_context_unranked(question):
     return chunks
 
 
-def fetch_context(original_question, history):
+def fetch_context(original_question: str, history: list[dict] = []):
     rewritten_question = rewrite_query(original_question, history)
     chunks1 = fetch_context_unranked(original_question)
     chunks2 = fetch_context_unranked(rewritten_question)
