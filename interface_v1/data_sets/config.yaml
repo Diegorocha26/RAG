@@ -1,0 +1,89 @@
+# ── LLM Configuration ──────────────────────────────────────────────────────────
+# Any model string supported by LiteLLM works here:
+#   openai/gpt-4o, anthropic/claude-opus-4, openai/gpt-4o-mini, etc.
+llm:
+  model: "openai/gpt-4.1-nano"
+  temperature: 0.7
+  max_tokens: 8192
+  # API keys are read from environment variables (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.)
+  # You can also set them explicitly here (not recommended for shared repos):
+  # api_key: "sk-..."
+
+# ── Dataset Size ────────────────────────────────────────────────────────────────
+dataset:
+  total_questions: 100         # Total questions in the final JSONL
+  min_per_file: 1              # Floor: every file gets at least this many questions
+  max_pct_per_file: 0.05       # Ceiling: no file contributes more than 5% of total
+  spanning_ratio: 0.15         # Fraction of total reserved for spanning/holistic questions
+                               # e.g. 0.10 → 10 spanning out of 100
+
+# ── Categories ──────────────────────────────────────────────────────────────────
+# weight: proportion of single-doc questions assigned to this category.
+# Weights are normalized automatically, so they don't need to sum to 1.
+# description: injected into the LLM prompt so it knows what to generate.
+# multi_doc: if true, this category is used in the spanning pass (Pass 2), not Pass 1.
+categories:
+  direct_fact:
+    weight: 0.45
+    multi_doc: false
+    description: >
+      A straightforward question with a single, clearly stated answer found
+      verbatim or near-verbatim in one document. Tests basic retrieval.
+
+  temporal:
+    weight: 0.20
+    multi_doc: false
+    description: >
+      A question involving dates, deadlines, timelines, or sequences of events.
+      The answer must reference a specific time or period mentioned in the document.
+
+  comparative:
+    weight: 0.15
+    multi_doc: false
+    description: >
+      A question that requires comparing two or more entities, values, or options
+      within the same document (e.g. pricing tiers, feature differences).
+
+  spanning:
+    weight: 0.10
+    multi_doc: true
+    description: >
+      A question whose answer requires combining specific facts from at least
+      two different documents. Tests cross-document retrieval and reasoning.
+
+  holistic:
+    weight: 0.10
+    multi_doc: true
+    description: >
+      A question that requires a broad understanding of the entire knowledge base
+      (e.g. counts, aggregations, patterns across all documents). Tests
+      comprehensive understanding rather than pinpoint retrieval.
+
+# ── Pass 3 Curation ─────────────────────────────────────────────────────────────
+curation:
+  enabled: true
+  # Minimum quality score (1–10) for a question to survive Pass 3
+  min_score: 7
+  # Criteria the LLM judge evaluates on:
+  criteria:
+    - "Clarity: the question is unambiguous and well-formed"
+    - "Answerability: the reference_answer is fully supported by the source document(s)"
+    - "Relevance: the question tests something meaningful, not trivial"
+    - "Diversity: prefer questions that cover different facts than others in the set"
+
+# ── File Handling ────────────────────────────────────────────────────────────────
+files:
+  # Supported extensions and how to read them.
+  # Add new ones here — the loader will pick them up automatically.
+  supported_extensions:
+    - .md
+    - .txt
+    - .pdf
+    - .csv
+    - .docx
+
+# ── Paths ────────────────────────────────────────────────────────────────────────
+paths:
+  examples_file: "interface_v1/data_sets/examples.jsonl"    # Few-shot examples to guide generation style
+  output_file: "test-sets/generated/output_dataset.jsonl"   # Final curated dataset
+  intermediate_dir: "intermediate/"                         # Pass 1 & 2 intermediate JSON files (kept for debugging)
