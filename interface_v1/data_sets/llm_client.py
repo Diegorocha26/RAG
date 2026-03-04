@@ -7,10 +7,11 @@ Any model string supported by LiteLLM works (openai/gpt-4o, anthropic/claude-opu
 
 # TODO: check structured outputs implementation with pydantic
 # TODO: max_tokens controls the number of output tokens of the model, this should scale with the number of questions that are looking to be generated.
-#       change this in config.yaml, generator.py and in this file. also leave a note for the user becuase each model has different limits
+#       change this in config.yaml, generator.py and in this file. also leave a note for the user because each model has different limits
 
 import re
 import json
+import litellm
 from typing import Any
 
 
@@ -26,14 +27,6 @@ def call_llm(
     Send a prompt to the LLM and return the raw text response.
     Raises RuntimeError on failure.
     """
-    try:
-        import litellm
-    except ImportError:
-        raise ImportError(
-            "litellm is required. Install it with:\n"
-            "  uv add litellm"
-        )
-
     messages = [{"role": "user", "content": prompt}]
 
     response = litellm.completion(

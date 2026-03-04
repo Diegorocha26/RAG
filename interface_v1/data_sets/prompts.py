@@ -8,8 +8,8 @@ import json
 
 
 # TODO: looks good but check if pydantic would be better for structured outputs instead of leaving it to the LLM
-# TODO: for pass1, get the examples based on the categories istead of assuming its the first three (like what is done in pass 2).
-#       this also goes for the "categories" part of the output. generate it based on the config file, don't assume it 
+# TODO: for pass1, get the examples based on the categories instead of assuming its the first three (like what is done in pass 2).
+#       this also goes for the "categories" part of the outputs. generate it based on the config file, don't hardcode the categories
 # TODO: for pass2 it's good that it checks for spanning and holistic examples, but let this be determined by multi doc: true, since the name of the categories can change 
 
 # ── Shared system prompt ────────────────────────────────────────────────────────

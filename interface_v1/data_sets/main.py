@@ -147,9 +147,7 @@ def main():
     # Run the generator
     generator = DatasetGenerator(config)
     try:
-        # generator.run(kb_path=args.kb, output_path=config["paths"].get("output_file"))
-        # TODO: reactivate this after testing
-        print("RAN!")
+        generator.run(kb_path=args.kb, output_path=config["paths"].get("output_file"))
     except KeyboardInterrupt:
         log.info("\nInterrupted by user. Intermediate results saved in intermediate/ directory.")
         sys.exit(0)

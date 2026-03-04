@@ -7,6 +7,7 @@ Add new loaders by registering a function in LOADERS dict at the bottom.
 """
 
 # TODO: edge-case: divide extremely big files (ex. multi-page pdfs, excels, etc.) into parts so that they don't take out the entire context window of the model
+# TODO: check if imports should be done at module level instead
 
 import os
 import csv
@@ -23,7 +24,7 @@ def load_text(path: Path) -> str:
 
 def load_csv(path: Path) -> str:
     # TODO: check is this is the best way of feeding a csv to an LLM. 
-    #       cosnider other other alternatives such as marksown, html tables, etc. instead of " | "
+    #       consider other other alternatives such as markdown, html tables, etc. instead of " | "
     """Convert CSV to a readable text table."""
     rows = []
     with open(path, "r", encoding="utf-8", errors="replace") as f:
