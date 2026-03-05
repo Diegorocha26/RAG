@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 
 class DatasetGenerator:
     def __init__(self, config: dict):
-        # NOTE: CHECK
         self.cfg = config
         self.llm_cfg = config["llm"]
         self.dataset_cfg = config["dataset"]
@@ -55,7 +54,6 @@ class DatasetGenerator:
     # ── Helpers ─────────────────────────────────────────────────────────────────
 
     def _llm(self, prompt: str, system: str = SYSTEM_PROMPT) -> str:
-        # NOTE: CHECK
         return call_llm(
             prompt=prompt,
             system=system,
@@ -65,7 +63,6 @@ class DatasetGenerator:
         )
 
     def _load_examples(self) -> list[dict]:
-        # NOTE: CHECK
         examples_path = Path(self.paths_cfg["examples_file"])
         if not examples_path.exists():
             logger.warning(f"Examples file not found: {examples_path}. Proceeding without examples.")
@@ -87,7 +84,7 @@ class DatasetGenerator:
         Distribute single-doc question budget across files proportionally by file size,
         respecting min_per_file and max_pct_per_file constraints.
         """
-        # TODO: edge case: if total_questions is less than the min_per_file * number_of_files len(files)
+        # TODO: edge case: if total_questions is less than the min_per_file * number_of_files aka. len(files)
         # TODO: add normalization to make sure its mathematically correct (carefull with rounded)
         total = self.dataset_cfg["total_questions"]
         spanning_ratio = self.dataset_cfg.get("spanning_ratio", 0.2)
@@ -115,10 +112,14 @@ class DatasetGenerator:
         for key in allocation:
             allocation[key] = min(allocation[key], max_q)
 
+        # TODO: there's no re-distribution after enforcing max questions per file
+
         return allocation
 
     def _save_intermediate(self, data: dict | list, name: str):
         """Save intermediate pass results to disk for debugging."""
+        # TODO: make intermediate the "base folder" for all intermediate files, but add a sub folder based on the root directory of the dataset generations
+        # Ex. intermdiate/test-knowledge-base
         inter_dir = Path(self.paths_cfg.get("intermediate_dir", "intermediate/"))
         inter_dir.mkdir(parents=True, exist_ok=True)
         out_path = inter_dir / name
@@ -156,9 +157,10 @@ class DatasetGenerator:
                 examples=examples,
                 n_questions=n_questions,
             )
-            print(f"Prompt 1: {prompt}")
+            logger.debug(f"Prompt 1: {prompt}")
 
             try:
+                # TODO: once again, use structure outputs and don't depend on the LLM alone to output the correct structure
                 raw = self._llm(prompt)
                 result = extract_json(raw)
 
@@ -198,6 +200,8 @@ class DatasetGenerator:
         """
         Generate spanning/holistic questions from combined extracted facts.
         """
+        # TODO: all extractions are passed in the prompt (this may exceed context window for large datasets)
+        # do it by subsets or cluster info into batches if the dataset is too large (like in pass 3)
         if not self.multi_doc_cats:
             logger.info("[Pass 2] No multi-doc categories configured. Skipping.")
             return []
@@ -209,6 +213,7 @@ class DatasetGenerator:
             logger.warning("[Pass 2] Need at least 2 documents for spanning questions. Skipping.")
             return []
 
+        # TODO: "spanning&holistic" is hardcoded many times, either leave it as a standard in all datasets or make it more flexible
         logger.info(f"[Pass 2] Generating {n_spanning} spanning/holistic questions across {len(all_extractions)} documents")
 
         prompt = pass2_spanning_prompt(
@@ -238,15 +243,19 @@ class DatasetGenerator:
         LLM-as-judge: score and filter all candidate questions down to target total.
         If curation is disabled, return the top N by naive ordering.
         """
+        # TODO: make sure this curation respects the weights
+        # TODO: use pydantic or another structured format to verify the integrity of the the answer's format
         total = self.dataset_cfg["total_questions"]
         logger.info(f"[Pass 3] Curating {len(all_questions)} candidates → {total} final questions")
 
         if not self.curation_cfg.get("enabled", True):
+            # TODO: have a better logic for this (maybe select N random questions?). Since all_questions = single_doc_qs + spanning_qs; selecting first N could remove all spanning/holistic
             logger.info("  Curation disabled. Taking first N questions.")
             return all_questions[:total]
 
         # If we have too many candidates to send in one call, batch them
         # LLMs can handle ~100-200 questions comfortably in one call
+        # TODO: maybe batch size can be something more modifiable in config.yml or calculated with some reasoning based on number of questions and model context length
         batch_size = 80
         if len(all_questions) > batch_size:
             # Do a pre-filter: score in batches, then do a final selection pass
@@ -308,7 +317,6 @@ class DatasetGenerator:
         allocation = self._distribute_questions(files)
         logger.info(f"Question allocation: {allocation}")
 
-        # TODO: CHECK
         # ── Pass 1 ────────────────────────────────────────────────────────────
         logger.info("\n── PASS 1: Extraction & Single-Doc Generation ─────────────")
         extractions, single_doc_qs = self.pass1_extract_and_generate(files, allocation, examples)
@@ -332,6 +340,7 @@ class DatasetGenerator:
         out_path.parent.mkdir(parents=True, exist_ok=True)
 
         with open(out_path, "w") as f:
+            # TODO: tal vez esto se podria hacer con pydantic.
             for q in final_questions:
                 # Ensure consistent field order in output
                 record = {
@@ -343,6 +352,9 @@ class DatasetGenerator:
                     "quality_score": q.get("quality_score"),
                 }
                 f.write(json.dumps(record) + "\n")
+            
+            # TODO: podria ser bueno revisar los weights del dataset final (dejando un margen de error), 
+            # si no dan los numeros, completar con los archivos intermediarios del pass1 y pass2 
 
         logger.info(f"\n✅ Done! {len(final_questions)} questions written to: {out_path}")
         logger.info("=" * 60)
