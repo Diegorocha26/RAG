@@ -16,6 +16,9 @@ chroma.sqlite3
 # Test Sets
 test-sets/
 
+# Intermidiate files in the dataset generation pipeline
+intermidiate/
+
 # Distribution / packaging
 .Python
 build/
