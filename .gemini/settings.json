@@ -1,0 +1,14 @@
+{
+  "ui": {
+    "footer": {
+      "hideContextPercentage": false
+    },
+    "showModelInfoInChat": true
+  },
+  "general": {
+    "sessionRetention": {
+      "enabled": false,
+      "maxAge": ""
+    }
+  }
+}
