@@ -125,3 +125,17 @@ def discover_files(kb_path: str, supported_extensions: list[str]) -> list[Path]:
                 files.append(p)
 
     return sorted(files)
+
+# Testing loaders
+if __name__ == "__main__":
+    files = discover_files("data/test-knowledge-base", [".md", ".txt"])
+    print(f"Files: {files}")
+    for i, file_path in enumerate(files):
+        try:
+            content = load_file(file_path)
+            print("-" * 70)
+            print("-" * 70)
+            print(f"File #{i} Content: {content}")
+        except Exception as e:
+            print(f"Failed to load {file_path}: {e}")
+            continue
