@@ -27,12 +27,14 @@ def call_llm(
     Send a prompt to the LLM and return the raw text response.
     Raises RuntimeError on failure.
     """
-    messages = [{"role": "user", "content": prompt}]
+    messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": prompt}
+    ]
 
     response = litellm.completion(
         model=model,
         messages=messages,
-        system=system,
         temperature=temperature,
         max_tokens=max_tokens,
         **kwargs,
@@ -67,3 +69,14 @@ def extract_json(text: str) -> Any:
                 continue
 
     raise ValueError(f"Could not extract valid JSON from LLM output:\n{text[:500]}")
+
+
+# Test LLM
+if __name__ == "__main__":
+    prompt = "Hello"
+    system = "You're a helpfull and funny assistant."
+    model = "openai/gpt-4.1-nano"
+    temperature = 0.7
+    max_tokens = 8192
+    response = call_llm(prompt, system, model, temperature, max_tokens)
+    print(response)
