@@ -1,0 +1,22 @@
+description = 'Goes through the whole code base, finds pending TODOs and organices them by priority'
+
+prompt = '''
+Go through the whole codebase and find TODO statements in the code.
+
+If two or various TODOs mean practically the same thing you can summarize them into a single one.
+
+Once you've collected all of the TODOs organize them into two lists.
+
+The first list will categorize them from most difficult to easiest in terms of implementation. How complicated would it be to implement this changes, how much would this changes affect the current code, could these changes increase the chance of the code breaking / introduce bugs, would these changes change the architecture, would they require new services / libraries / technologies, etc.
+
+The second list would categorize them from most important to least important. Based on the current status of the codebase, which changes would have the most positive impact and what changes are the most esential for the code.
+
+Both lists should follow this format:
+    - Title: short description of the TODO
+    - Context: the file path in which the TODO was found
+    - Description: a concise description of the TODO and why was it placed where it was placed 
+
+Lastly, could you take both of this lists and combine them into an eisenhower matrix (Value/Importance vs Effort).
+
+At the end, give me back the top {{args}} TODOs in the first two lists, as well the the eisenhower matrix with the maximum {{args}} TODOs per quadrant, and finally give me a list of the top {{args}} tasks you think I should immediately work on.
+'''
